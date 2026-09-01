@@ -20,10 +20,10 @@ resource "aws_iam_role" "github_actions_ci_cd" {
       },
       Action: "sts:AssumeRoleWithWebIdentity",
       Condition = {
-        StringEquals: {
-          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
-          "token.actions.githubusercontent.com:sub": "repo:AreebC/Fast-API:ref:refs/heads/main"
-        }
+        StringEquals = {
+        "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+        "token.actions.githubusercontent.com:sub" = "repo:AreebC@222809665/Fast-API@1349904382:ref:refs/heads/main"
+       }
       }
      }
     ]
