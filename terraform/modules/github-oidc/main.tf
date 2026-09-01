@@ -40,6 +40,49 @@ resource "aws_iam_role_policy_attachment" "terraform_eks" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 }
 
+resource "aws_iam_policy" "terraform_eks_access" {
+  name        = "TerraformEKSAccess"
+  description = "Permissions for Terraform to manage EKS"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "eks:DescribeCluster",
+          "eks:ListClusters",
+          "eks:CreateCluster",
+          "eks:DeleteCluster",
+          "eks:UpdateClusterConfig",
+          "eks:UpdateClusterVersion",
+          "eks:TagResource",
+          "eks:UntagResource",
+
+          "eks:DescribeNodegroup",
+          "eks:ListNodegroups",
+          "eks:CreateNodegroup",
+          "eks:DeleteNodegroup",
+          "eks:UpdateNodegroupConfig",
+          "eks:UpdateNodegroupVersion",
+
+          "eks:DescribeAddon",
+          "eks:ListAddons",
+          "eks:CreateAddon",
+          "eks:DeleteAddon",
+          "eks:UpdateAddon"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "terraform_eks_access" {
+  role       = aws_iam_role.github_actions_ci_cd.name
+  policy_arn = aws_iam_policy.terraform_eks_access.arn
+}
+
 resource "aws_iam_role_policy_attachment" "terraform_iam" {
   role       = aws_iam_role.github_actions_ci_cd.name
   policy_arn = "arn:aws:iam::aws:policy/IAMFullAccess"
