@@ -55,14 +55,14 @@ jobs:
       - name: Terraform plan
         if: github.event_name == 'pull_request'
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform plan -input=false -no-color
+        run: terraform plan -var-file="environments/terraform.tfvars" -input=false -no-color
        
       - name: Terraform plan (main)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform plan -input=false -no-color -out=tfplan
+        run: terraform plan -var-file="environments/terraform.tfvars" -input=false -no-color -out=tfplan
 
       - name: Terraform apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform apply -input=false -auto-approve tfplan
+        run: terraform apply -var-file="environments/terraform.tfvars" -input=false -auto-approve tfplan
