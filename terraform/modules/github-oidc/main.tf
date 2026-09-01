@@ -23,7 +23,7 @@ resource "aws_iam_role" "github_actions_ci_cd" {
         StringEquals: {
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
         },
-        StringLike: {
+        StringEquals: {
           "token.actions.githubusercontent.com:sub": "repo:AreebC/Fast-API:ref:refs/heads/main"
         }
       }
