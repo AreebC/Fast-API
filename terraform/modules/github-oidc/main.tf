@@ -59,3 +59,8 @@ resource "aws_iam_role_policy_attachment" "dynamodb_access" {
   role       = aws_iam_role.github_actions_ci_cd.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
 }
+
+resource "aws_iam_role_policy_attachment" "terraform_ec2" {
+  role       = aws_iam_role.github_actions_ci_cd.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+}
