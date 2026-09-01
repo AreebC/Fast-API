@@ -1,0 +1,6 @@
+argo-cd:
+  installCRDs: true
+
+  server:
+    service:
+      type: LoadBalancer

@@ -1,0 +1,12 @@
+clusterName: my-eks-cluster
+region: us-east-1
+
+serviceAccount:
+  create: false
+  name: aws-load-balancer-controller
+
+replicaCount: 2
+
+enableShield: false
+enableWaf: false
+enableWafv2: false

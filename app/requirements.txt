@@ -1,0 +1,5 @@
+fastapi
+prometheus-fastapi-instrumentator
+uvicorn
+pytest
+httpx

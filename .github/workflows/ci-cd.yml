@@ -1,0 +1,76 @@
+name: FastAPI CI-CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "app/**"
+      - "gitops/apps/fastapi-app/**"
+      - ".github/workflows/ci-cd.yml"
+
+permissions:
+  contents: write
+  id-token: write
+
+env:
+  AWS_REGION: us-east-1
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  ECR_REPOSITORY: fastapi-app
+  DEPLOYMENT_FILE: gitops/apps/fastapi-app/deployment.yaml
+
+jobs:
+  build:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Dependencies
+        run: |
+          cd app
+          pip install -r requirements.txt
+
+      - name: Run Tests
+        run: |
+          cd app
+          pytest -q
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github-actions-ci-cd-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Tag image
+        id: vars
+        run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Build and Push Docker Image
+        run: |
+          IMAGE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${{ steps.vars.outputs.IMAGE_TAG }}
+          docker build -t $IMAGE_URI app/
+          docker push $IMAGE_URI
+
+      - name: Update deployment manifest
+        run: |
+          IMAGE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${{ steps.vars.outputs.IMAGE_TAG }}
+          sed -i "s#image: .*#image: ${IMAGE_URI}#g" ${DEPLOYMENT_FILE}
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ${DEPLOYMENT_FILE}
+          git commit -m "Update FastAPI image to ${{ steps.vars.outputs.IMAGE_TAG }}" || echo "No changes"
+          git push
+    

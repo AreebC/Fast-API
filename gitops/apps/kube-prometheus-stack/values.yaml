@@ -1,0 +1,205 @@
+prometheusOperator:
+  enabled: true
+  admissionWebhooks:
+    enabled: true
+  manageCRDs: true
+
+prometheus: 
+  enabled: true
+  rbac:
+    create: true
+  prometheusSpec:
+    replicas: 1
+    retention: 10d
+    scrapeInterval: 30s
+
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 20Gi
+          storageClassName: standard
+
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 250m
+      limits:
+        memory: 1Gi
+        cpu: 500m
+
+    serviceMonitorSelector : {}
+    podMonitorSelector : {}
+    ruleSelector: {}
+
+alertmanager:
+  enabled: true
+  config: 
+    global:
+      smtp_smarthost: 'smtp.example.com:587'
+      smtp_from: 'alertmanager@example.com'
+    route:
+      receiver: 'email-notifications'
+      group_by: ['alertname']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 4h
+    receivers:
+      - name: 'email-notifications'
+        email_configs:
+          - to: 'your-email@example.com'
+  
+grafana:
+  admin:
+    existingSecret: grafana-admin
+    passwordKey: admin-password
+
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      url:  http://loki.monitoring.svc.cluster.local
+      access: proxy
+
+  sidecar:
+    dashboards:
+      enabled: true
+    datasources:
+      enabled: true
+  
+  service:
+    type: ClusterIP
+    port: 80
+
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClassName: standard
+    type: pvc
+
+  dashboards:
+    fastapi:
+      fastapi-observability:
+        json: |
+          {
+            "title": "FastAPI Observability Dashboard",
+            "uid": "fastapi-observability",
+            "schemaVersion": 36,
+            "version": 1,
+            "refresh": "10s",
+            "panels": [
+              {
+                "type": "timeseries",
+                "title": "Error Rate (5xx)",
+                "datasource": "Loki",
+                "targets": [
+                  {
+                    "expr": "sum(rate({app=\\"fastapi\\"} | json | status_code >= 500 [5m]))",
+                    "refId": "A"
+                  }
+                ],
+                "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 }
+              },
+              {
+                "type": "timeseries",
+                "title": "Average Latency (ms)",
+                "datasource": "Loki",
+                "targets": [
+                  {
+                    "expr": "avg_over_time({app=\\"fastapi\\"} | json | unwrap duration_ms [5m])",
+                    "refId": "A"
+                  }
+                ],
+                "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 }
+              },
+              {
+                "type": "timeseries",
+                "title": "Request Volume (RPS)",
+                "datasource": "Loki",
+                "targets": [
+                  {
+                    "expr": "sum(rate({app=\\"fastapi\\"} | json | unwrap status_code [5m]))",
+                    "refId": "A"
+                  }
+                ],
+                "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 }
+              },
+              {
+                "type": "bargauge",
+                "title": "Top 5 Endpoints",
+                "datasource": "Loki",
+                "targets": [
+                  {
+                    "expr": "topk(5, sum by (path) (rate({app=\\"fastapi\\"} | json | unwrap path [5m])))",
+                    "refId": "A"
+                  }
+                ],
+                "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 }
+              },
+              {
+                "type": "timeseries",
+                "title": "Pod CPU Usage",
+                "datasource": "Prometheus",
+                "targets": [
+                  {
+                    "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\\"monitoring\\", pod=~\\"fastapi.*\\"}[5m]))",
+                    "refId": "A"
+                  }
+                ],
+                "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 }
+              },
+              {
+                "type": "timeseries",
+                "title": "Pod Memory Usage",
+                "datasource": "Prometheus",
+                "targets": [
+                  {
+                    "expr": "sum by (pod) (container_memory_usage_bytes{namespace=\\"monitoring\\", pod=~\\"fastapi.*\\"})",
+                    "refId": "A"
+                  }
+                ],
+                "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 }
+              },
+              {
+                "type": "timeseries",
+                "title": "Pod Restarts",
+                "datasource": "Prometheus",
+                "targets": [
+                  {
+                    "expr": "sum by (pod) (kube_pod_container_status_restarts_total{namespace=\\"monitoring\\", pod=~\\"fastapi.*\\"})",
+                    "refId": "A"
+                  }
+                ],
+                "gridPos": { "x": 0, "y": 24, "w": 24, "h": 8 }
+              }
+            ]
+          }
+  
+kubeStateMetrics:
+  enabled: true
+
+nodeExporter:
+  enabled: true
+
+additionalPrometheusRulesMap:
+  fastapi-rules:
+    groups:
+      - name: fastapi.rules
+        rules:
+          - alert: HighErrorRate
+            expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+            for: 2m
+            labels:
+              severity: critical
+            annotations:
+              summary: "High error rate detected"
+              description: "The error rate has exceeded 5% for more than 2 minutes."
+          - alert: HighLatency
+            expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 0.5
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High latency detected"
+              description: "The 95th percentile latency has exceeded 500ms for more than 2 minutes."
