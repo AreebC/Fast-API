@@ -24,7 +24,7 @@ resource "aws_iam_role" "github_actions_ci_cd" {
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
         },
         StringLike: {
-          "token.actions.githubusercontent.com:sub": "repo:AreebC/fastapi-app:ref:refs/heads/main"
+          "token.actions.githubusercontent.com:sub": "repo:AreebC/Fast-API:ref:refs/heads/main"
         }
       }
      }
