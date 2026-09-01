@@ -19,11 +19,9 @@ resource "aws_iam_role" "github_actions_ci_cd" {
         Federated: "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
       },
       Action: "sts:AssumeRoleWithWebIdentity",
-      Condition: {
+      Condition = {
         StringEquals: {
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
-        },
-        StringEquals: {
           "token.actions.githubusercontent.com:sub": "repo:AreebC/Fast-API:ref:refs/heads/main"
         }
       }
