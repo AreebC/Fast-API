@@ -65,4 +65,4 @@ jobs:
       - name: Terraform apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform apply -var-file="environments/terraform.tfvars" -input=false -auto-approve tfplan
+        run: terraform apply -input=false -auto-approve tfplan
