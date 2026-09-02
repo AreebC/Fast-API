@@ -20,7 +20,7 @@ prometheus:
           resources:
             requests:
               storage: 20Gi
-          storageClassName: standard
+          storageClassName: gp3
 
     resources:
       requests:
@@ -75,7 +75,7 @@ grafana:
   persistence:
     enabled: true
     size: 10Gi
-    storageClassName: standard
+    storageClassName: gp3
     type: pvc
 
   dashboards:

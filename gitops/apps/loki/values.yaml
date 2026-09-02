@@ -45,7 +45,7 @@ loki:
   persistence:
     enabled: true
     size: 10Gi
-    storageClassName: standard
+    storageClassName: gp3
 
   resources:
     requests:
