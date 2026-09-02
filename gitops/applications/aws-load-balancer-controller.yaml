@@ -23,6 +23,12 @@ spec:
           - name: clusterName
             value: fastapi-eks-cluster
 
+          - name: region
+            value: us-east-1
+
+          - name: vpcId
+            value: vpc-0ed49b56c2881f264
+           
     - repoURL: https://github.com/AreebC/Fast-API.git
       targetRevision: main
       ref: values
