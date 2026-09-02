@@ -16,6 +16,8 @@ module "vpc" {
   private_subnet_cidr_block2 = var.private_subnet_cidr_block2
   availability_zone          = var.availability_zone
   availability_zone2         = var.availability_zone2
+  subnet_tags                = var.subnet_tags
+  private_subnet_tags        = var.private_subnet_tags
 }
 
 module "eks" {

@@ -43,8 +43,14 @@ variable "availability_zone2" {
     type        = string
 }
 
-variable "tags" {
+variable "subnet_tags" {
     description = "Additional tags to apply to resources"
+    type        = map(string)
+    default     = {}
+}
+
+variable "private_subnet_tags" {
+    description = "Additional tags to apply to private subnets"
     type        = map(string)
     default     = {}
 }

@@ -18,8 +18,14 @@ vpc_name = "fastapi-vpc"
 env = "production"
 subnet_cidr_block = "10.0.1.0/24"
 subnet_cidr_block2 = "10.0.2.0/24"
+subnet_tags = {
+  "kubernetes.io/role/elb" = "1"
+}
 private_subnet_cidr_block = "10.0.3.0/24"
 private_subnet_cidr_block2 = "10.0.4.0/24"
+private_subnet_tags = {
+  "kubernetes.io/role/internal-elb" = "1"
+}
 availability_zone = "us-east-1a"
 availability_zone2 = "us-east-1b"
 cluster_name = "fastapi-eks-cluster"

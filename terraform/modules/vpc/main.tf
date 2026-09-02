@@ -13,7 +13,7 @@ resource "aws_subnet" "subnet" {
     cidr_block = var.subnet_cidr_block
     availability_zone = var.availability_zone
     map_public_ip_on_launch = true
-    tags = var.tags
+    tags = var.subnet_tags
 }
 
 resource "aws_subnet" "subnet2" {
@@ -21,7 +21,7 @@ resource "aws_subnet" "subnet2" {
     cidr_block = var.subnet_cidr_block2
     availability_zone = var.availability_zone2
     map_public_ip_on_launch = true
-    tags = var.tags
+    tags = var.subnet_tags
 }
 
 resource "aws_subnet" "private_subnet" {
@@ -29,9 +29,7 @@ resource "aws_subnet" "private_subnet" {
     cidr_block = var.private_subnet_cidr_block
     availability_zone = var.availability_zone
     map_public_ip_on_launch = false
-    tags = {
-        Name = "${var.vpc_name}-private-subnet"
-    }
+    tags = var.private_subnet_tags
 }
 
 resource "aws_subnet" "private_subnet2" {
@@ -39,9 +37,7 @@ resource "aws_subnet" "private_subnet2" {
     cidr_block = var.private_subnet_cidr_block2
     availability_zone = var.availability_zone2
     map_public_ip_on_launch = false
-    tags = {
-        Name = "${var.vpc_name}-private-subnet-2"
-    }
+    tags = var.private_subnet_tags
 }
 
 resource "aws_internet_gateway" "igw" {

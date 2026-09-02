@@ -84,6 +84,12 @@ variable "subnet_cidr_block2" {
   type        = string
 }
 
+variable "subnet_tags" {
+  description = "A map of tags to apply to the subnets"
+  type        = map(string)
+  default     = {}
+}
+
 variable "private_subnet_cidr_block" {
   description = "The CIDR block for the first private subnet"
   type        = string
@@ -92,6 +98,12 @@ variable "private_subnet_cidr_block" {
 variable "private_subnet_cidr_block2" {
   description = "The CIDR block for the second private subnet"
   type        = string
+}
+
+variable "private_subnet_tags" {
+  description = "A map of tags to apply to the private subnets"
+  type        = map(string)
+  default     = {}
 }
 
 variable "availability_zone" {
