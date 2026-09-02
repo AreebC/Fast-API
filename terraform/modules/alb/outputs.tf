@@ -9,3 +9,4 @@ output "service_account_namespace" {
 output "iam_role_arn" {
   value = aws_iam_role.alb_irsa.arn
 }
+

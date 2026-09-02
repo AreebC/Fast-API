@@ -20,9 +20,17 @@ module "vpc" {
   private_subnet_tags        = var.private_subnet_tags
 }
 
+module "iam-cluster" {
+  source                              = "./modules/iam-cluster"
+  tags                                = var.tags
+  eks_cluster_role_name               = var.eks_cluster_role_name
+  eks_nodegroup_role_name             = var.eks_nodegroup_role_name
+  eks_nodegroup_instance_profile_name = var.eks_nodegroup_instance_profile_name
+}
+
 module "eks" {
   source                    = "./modules/eks"
-  depends_on                = [module.vpc]
+  depends_on                = [module.vpc, module.iam-cluster]
   cluster_name              = var.cluster_name
   tags                      = var.tags
   eks_cluster_role_arn      = module.iam-cluster.eks_cluster_role_arn
@@ -36,12 +44,33 @@ module "eks" {
   private_subnet_cidrs      = module.vpc.private_subnet_cidrs
 }
 
-module "iam-cluster" {
-  source                              = "./modules/iam-cluster"
-  tags                                = var.tags
-  eks_cluster_role_name               = var.eks_cluster_role_name
-  eks_nodegroup_role_name             = var.eks_nodegroup_role_name
-  eks_nodegroup_instance_profile_name = var.eks_nodegroup_instance_profile_name
+module "eks-oidc" {
+  source       = "./modules/eks-oidc"
+  eks_oidc_url = module.eks.oidc_issuer_url
+  depends_on   = [module.eks]
+}
+
+module "ebs-csi-iam" {
+  source = "./modules/ebs-csi-iam"
+
+  eks_oidc_provider_arn = module.eks-oidc.oidc_provider_arn
+  eks_oidc_hostpath     = module.eks-oidc.oidc_hostpath
+
+  depends_on = [
+    module.eks-oidc
+  ]
+}
+
+module "eks-addons" {
+  source = "./modules/eks-addons"
+
+  cluster_name     = module.eks.cluster_name
+  ebs_csi_role_arn = module.ebs-csi-iam.ebs_csi_role_arn
+
+  depends_on = [
+    module.eks,
+    module.ebs-csi-iam
+  ]
 }
 
 module "ecr-pull-iam" {
@@ -66,13 +95,15 @@ module "github-oidc" {
 }
 
 module "alb" {
-  source               = "./modules/alb"
-  eks_OIDC             = module.eks.oidc_issuer_url
-  namespace            = var.alb_namespace
-  cluster_name         = var.cluster_name
-  region               = var.region
-  service_account_name = var.alb_service_account_name
-  depends_on           = [module.eks, module.iam-cluster]
+  source                = "./modules/alb"
+  eks_OIDC              = module.eks.oidc_issuer_url
+  namespace             = var.alb_namespace
+  cluster_name          = var.cluster_name
+  region                = var.region
+  service_account_name  = var.alb_service_account_name
+  eks_oidc_provider_arn = module.eks-oidc.oidc_provider_arn
+  eks_oidc_hostpath     = module.eks-oidc.oidc_hostpath
+  depends_on            = [module.eks, module.iam-cluster]
 }
 
 module "argocd" {

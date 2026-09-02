@@ -4,7 +4,7 @@ variable "eks_OIDC" {
 }
 
 variable "namespace" {
-  description = "The Kubernetes namespace to deploy the AWS Load Balancer Controller"  
+  description = "The Kubernetes namespace to deploy the AWS Load Balancer Controller"
   type        = string
 }
 
@@ -19,7 +19,14 @@ variable "region" {
 }
 
 variable "service_account_name" {
-  description = "The name of the Kubernetes service account to use for the AWS Load Balancer Controller" 
+  description = "The name of the Kubernetes service account to use for the AWS Load Balancer Controller"
   type        = string
 }
 
+variable "eks_oidc_provider_arn" {
+  type = string
+}
+
+variable "eks_oidc_hostpath" {
+  type = string
+}

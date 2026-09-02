@@ -3,7 +3,7 @@ data "aws_caller_identity" "current" {}
 resource "aws_iam_policy" "loki_s3" {
   name        = "${var.project_name}-LokiS3AccessPolicy"
   description = "Allows Loki to access S3 bucket for logs"
-  policy      = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {

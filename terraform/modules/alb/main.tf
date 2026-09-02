@@ -1,18 +1,3 @@
-data "aws_caller_identity" "current" {}
-
-locals {
-  eks_oidc_hostpath = replace(var.eks_OIDC, "https://", "")
-  eks_oidc_url      = "https://${local.eks_oidc_hostpath}"
-}
-
-resource "aws_iam_openid_connect_provider" "eks" {
-  url = local.eks_oidc_url
-
-  client_id_list = [
-    "sts.amazonaws.com"
-  ]
-}
-
 data "aws_iam_policy_document" "alb_irsa_assume_role" {
   statement {
     effect = "Allow"
@@ -25,13 +10,13 @@ data "aws_iam_policy_document" "alb_irsa_assume_role" {
       type = "Federated"
 
       identifiers = [
-        aws_iam_openid_connect_provider.eks.arn
+        var.eks_oidc_provider_arn
       ]
     }
 
     condition {
       test     = "StringEquals"
-      variable = "${local.eks_oidc_hostpath}:sub"
+      variable = "${var.eks_oidc_hostpath}:sub"
 
       values = [
         "system:serviceaccount:${var.namespace}:${var.service_account_name}"
@@ -40,7 +25,7 @@ data "aws_iam_policy_document" "alb_irsa_assume_role" {
 
     condition {
       test     = "StringEquals"
-      variable = "${local.eks_oidc_hostpath}:aud"
+      variable = "${var.eks_oidc_hostpath}:aud"
 
       values = [
         "sts.amazonaws.com"
@@ -49,19 +34,23 @@ data "aws_iam_policy_document" "alb_irsa_assume_role" {
   }
 }
 
+
 resource "aws_iam_role" "alb_irsa" {
   name = "alb-irsa-role"
 
   assume_role_policy = data.aws_iam_policy_document.alb_irsa_assume_role.json
 }
 
+
 resource "aws_iam_policy" "alb_controller_policy" {
-  name        = "AWSLoadBalancerControllerPolicy"
-  description = "IAM policy for AWS Load Balancer Controller"
-  policy      = file("${path.module}/iam-policy.json")
+  name        = "AWSLoadBalancerControllerIAMPolicy"
+  description = "IAM policy for the AWS Load Balancer Controller"
+
+  policy = file("${path.module}/iam-policy.json")
 }
 
-resource "aws_iam_role_policy_attachment" "alb_irsa_attachment" {
+
+resource "aws_iam_role_policy_attachment" "alb_controller_policy_attachment" {
   role       = aws_iam_role.alb_irsa.name
   policy_arn = aws_iam_policy.alb_controller_policy.arn
 }

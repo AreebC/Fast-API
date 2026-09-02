@@ -3,7 +3,7 @@ data "aws_caller_identity" "current" {}
 resource "aws_iam_policy" "ecr_pull" {
   name        = "${var.project_name}-ECRPullPolicy"
   description = "Allows EKS pods to pull images from ECR"
-  policy      = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
