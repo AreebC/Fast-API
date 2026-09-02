@@ -46,19 +46,21 @@ resource "aws_iam_policy" "terraform_eks_access" {
 
   policy = jsonencode({
     Version = "2012-10-17"
+
     Statement = [
       {
         Effect = "Allow"
+
         Action = [
+          # Cluster
           "eks:DescribeCluster",
           "eks:ListClusters",
           "eks:CreateCluster",
           "eks:DeleteCluster",
           "eks:UpdateClusterConfig",
           "eks:UpdateClusterVersion",
-          "eks:TagResource",
-          "eks:UntagResource",
 
+          # Node groups
           "eks:DescribeNodegroup",
           "eks:ListNodegroups",
           "eks:CreateNodegroup",
@@ -66,12 +68,30 @@ resource "aws_iam_policy" "terraform_eks_access" {
           "eks:UpdateNodegroupConfig",
           "eks:UpdateNodegroupVersion",
 
+          # Add-ons
           "eks:DescribeAddon",
           "eks:ListAddons",
           "eks:CreateAddon",
           "eks:DeleteAddon",
-          "eks:UpdateAddon"
+          "eks:UpdateAddon",
+
+          # EKS Access Entries
+          "eks:CreateAccessEntry",
+          "eks:DescribeAccessEntry",
+          "eks:UpdateAccessEntry",
+          "eks:DeleteAccessEntry",
+          "eks:ListAccessEntries",
+
+          # Access policy associations
+          "eks:AssociateAccessPolicy",
+          "eks:DisassociateAccessPolicy",
+          "eks:ListAssociatedAccessPolicies",
+
+          # Tags
+          "eks:TagResource",
+          "eks:UntagResource"
         ]
+
         Resource = "*"
       }
     ]
