@@ -25,7 +25,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -66,11 +68,21 @@ jobs:
           IMAGE_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${{ steps.vars.outputs.IMAGE_TAG }}
           sed -i "s#image: .*#image: ${IMAGE_URI}#g" ${DEPLOYMENT_FILE}
 
-      - name: Commit and push changes
+      - name: Commit and push deployment update
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add ${DEPLOYMENT_FILE}
-          git commit -m "Update FastAPI image to ${{ steps.vars.outputs.IMAGE_TAG }}" || echo "No changes"
-          git push
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add "${DEPLOYMENT_FILE}"
+
+          if git diff --cached --quiet; then
+            echo "No deployment changes to commit"
+            exit 0
+          fi
+
+          git commit -m "Update FastAPI image to ${GITHUB_SHA::7}"
+
+          git pull --rebase origin main
+
+          git push origin main
     
