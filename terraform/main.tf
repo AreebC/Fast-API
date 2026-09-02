@@ -70,6 +70,7 @@ module "alb" {
   cluster_name         = var.cluster_name
   region               = var.region
   service_account_name = var.alb_service_account_name
+  depends_on           = [module.eks, module.iam-cluster]
 }
 
 module "argocd" {
