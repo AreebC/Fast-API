@@ -6,11 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/AreebC/FastAPI-project.git
+    repoURL: https://github.com/AreebC/Fast-API.git
     targetRevision: main
-    path: gitops/apps
-    directory:
-      recurse: true
+    path: gitops/applications
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
