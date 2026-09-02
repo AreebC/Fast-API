@@ -6,14 +6,18 @@ metadata:
 spec:
   project: default
 
-  source:
-    repoURL: https://prometheus-community.github.io/helm-charts
-    chart: kube-prometheus-stack
-    targetRevision: 45.0.0   
-    helm:
-      releaseName: kube-prometheus-stack
-      valueFiles:
-        - values.yaml
+  sources:
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      targetRevision: 45.0.0   
+      helm:
+        releaseName: kube-prometheus-stack
+        valueFiles:
+          - $values/gitops/apps/kube-prometheus-stack/values.yaml
+    
+    - repoURL: https://github.com/AreebC/Fast-API.git
+      targetRevision: main
+      ref: values
 
   destination:
     server: https://kubernetes.default.svc
@@ -24,4 +28,5 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true   
+      - CreateNamespace=true
+      - ServerSideApply=true   
