@@ -1,19 +1,31 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
+
 metadata:
   name: aws-load-balancer-controller
   namespace: argocd
+
 spec:
   project: default
 
-  source:
-    repoURL: https://aws.github.io/eks-charts
-    chart: aws-load-balancer-controller
-    targetRevision: 1.8.1   
-    helm:
-      releaseName: aws-load-balancer-controller
-      valueFiles:
-        - values.yaml
+  sources:
+    - repoURL: https://aws.github.io/eks-charts
+      chart: aws-load-balancer-controller
+      targetRevision: 1.8.1
+
+      helm:
+        releaseName: aws-load-balancer-controller
+
+        valueFiles:
+          - $values/gitops/apps/aws-load-balancer-controller/values.yaml
+
+        parameters:
+          - name: clusterName
+            value: fastapi-eks-cluster
+
+    - repoURL: https://github.com/AreebC/Fast-API.git
+      targetRevision: main
+      ref: values
 
   destination:
     server: https://kubernetes.default.svc

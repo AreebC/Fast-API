@@ -1,19 +1,27 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
+
 metadata:
   name: loki
   namespace: argocd
+
 spec:
   project: default
 
-  source:
-    repoURL: https://grafana.github.io/helm-charts
-    chart: loki
-    targetRevision: 2.8.0   
-    helm:
-      releaseName: loki
-      valueFiles:
-        - values.yaml
+  sources:
+    - repoURL: https://grafana-community.github.io/helm-charts
+      chart: loki
+      targetRevision: 18.11.7
+
+      helm:
+        releaseName: loki
+
+        valueFiles:
+          - $values/gitops/apps/loki/values.yaml
+
+    - repoURL: https://github.com/AreebC/Fast-API.git
+      targetRevision: main
+      ref: values
 
   destination:
     server: https://kubernetes.default.svc
@@ -23,5 +31,6 @@ spec:
     automated:
       prune: true
       selfHeal: true
+
     syncOptions:
       - CreateNamespace=true
