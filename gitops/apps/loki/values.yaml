@@ -1,3 +1,5 @@
+deploymentMode: SingleBinary
+
 loki:
   enabled: true
 
@@ -57,6 +59,15 @@ singleBinary:
     limits:
       cpu: 500m
       memory: 512Mi
+
+backend:
+  replicas: 0
+
+read:
+  replicas: 0
+
+write:
+  replicas: 0
 
 serviceAccount:
   create: false
