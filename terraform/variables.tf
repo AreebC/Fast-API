@@ -44,6 +44,11 @@ variable "loki_service_account_name" {
   type        = string
 }
 
+variable "loki_namespace" {
+  description = "The Kubernetes namespace for Loki"
+  type        = string
+}
+
 variable "bucket_name1" {
   description = "The name of the first S3 bucket"
   type        = string

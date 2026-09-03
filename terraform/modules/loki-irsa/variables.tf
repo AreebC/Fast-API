@@ -13,7 +13,7 @@ variable "eks_OIDC" {
   type        = string
 }
 
-variable "namespace" {
+variable "loki_namespace" {
   description = "The Kubernetes namespace where the service account is located"
   type        = string
 }

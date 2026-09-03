@@ -38,7 +38,7 @@ resource "aws_iam_role" "loki_irsa" {
         Action = "sts:AssumeRoleWithWebIdentity",
         Condition = {
           StringEquals = {
-            "${var.eks_OIDC}:sub" = "system:serviceaccount:${var.namespace}:${var.service_account_name}"
+            "${var.eks_OIDC}:sub" = "system:serviceaccount:${var.loki_namespace}:${var.service_account_name}"
           }
         }
       }
@@ -49,4 +49,15 @@ resource "aws_iam_role" "loki_irsa" {
 resource "aws_iam_role_policy_attachment" "loki_attach" {
   role       = aws_iam_role.loki_irsa.name
   policy_arn = aws_iam_policy.loki_s3.arn
+}
+
+resource "kubernetes_service_account_v1" "loki" {
+  metadata {
+    name      = var.service_account_name
+    namespace = var.loki_namespace
+
+    annotations = {
+      "eks.amazonaws.com/role-arn" = aws_iam_role.loki_irsa.arn
+    }
+  }
 }
