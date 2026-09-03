@@ -3,17 +3,22 @@ kind: Application
 metadata:
   name: fluent-bit
   namespace: argocd
+
 spec:
   project: default
 
-  source:
-    repoURL: https://fluent.github.io/helm-charts
-    chart: fluent-bit
-    targetRevision: 0.19.0   
-    helm:
-      releaseName: fluent-bit
-      valueFiles:
-        - values.yaml
+  sources:
+    - repoURL: https://fluent.github.io/helm-charts
+      chart: fluent-bit
+      targetRevision: 0.19.0
+      helm:
+        releaseName: fluent-bit
+        valueFiles:
+          - $values/gitops/apps/fluent-bit/values.yaml
+
+    - repoURL: https://github.com/AreebC/Fast-API.git
+      targetRevision: main
+      ref: values
 
   destination:
     server: https://kubernetes.default.svc
