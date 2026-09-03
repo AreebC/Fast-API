@@ -2,7 +2,9 @@ prometheusOperator:
   enabled: true
   admissionWebhooks:
     enabled: true
-  manageCRDs: true
+    manageCRDs: true
+    patch:
+      enabled: false
 
 prometheus: 
   enabled: true
