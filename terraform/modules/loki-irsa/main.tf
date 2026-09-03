@@ -2,21 +2,36 @@ data "aws_caller_identity" "current" {}
 
 resource "aws_iam_policy" "loki_s3" {
   name        = "${var.project_name}-LokiS3AccessPolicy"
-  description = "Allows Loki to access S3 bucket for logs"
+  description = "Allows Loki to access its S3 buckets"
+
   policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2012-10-17"
+
     Statement = [
       {
-        Effect = "Allow",
+        Effect = "Allow"
+
+        Action = [
+          "s3:ListBucket"
+        ]
+
+        Resource = [
+          for bucket in var.bucket_names :
+          "arn:aws:s3:::${bucket}"
+        ]
+      },
+      {
+        Effect = "Allow"
+
         Action = [
           "s3:PutObject",
           "s3:GetObject",
-          "s3:ListBucket",
           "s3:DeleteObject"
-        ],
+        ]
+
         Resource = [
-          "arn:aws:s3:::${var.bucket_name}",
-          "arn:aws:s3:::${var.bucket_name}/*"
+          for bucket in var.bucket_names :
+          "arn:aws:s3:::${bucket}/*"
         ]
       }
     ]

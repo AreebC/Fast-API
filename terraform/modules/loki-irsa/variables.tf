@@ -3,9 +3,9 @@ variable "project_name" {
   type        = string
 }
 
-variable "bucket_name" {
+variable "bucket_names" {
   description = "The name of the S3 bucket for Loki logs"
-  type        = string
+  type        = list(string)
 }
 
 variable "eks_OIDC" {

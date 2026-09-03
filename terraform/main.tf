@@ -87,7 +87,11 @@ module "loki-irsa" {
   eks_OIDC             = module.eks.oidc_issuer_url
   loki_namespace       = var.loki_namespace
   service_account_name = var.loki_service_account_name
-  bucket_name          = module.s3.bucket_name1
+  bucket_names         = [ 
+    module.s3.bucket_name1,
+    module.s3.bucket_name2,
+    module.s3.bucket_name3
+  ]
 }
 
 module "github-oidc" {
