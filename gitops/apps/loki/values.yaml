@@ -42,10 +42,13 @@ loki:
         region: us-east-1
         endpoint: s3.amazonaws.com
 
-  persistence:
-    enabled: true
-    size: 10Gi
-    storageClassName: gp3
+  singleBinary:
+    replicas: 1
+
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: gp3
 
   resources:
     requests:
