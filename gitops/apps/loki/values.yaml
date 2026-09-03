@@ -11,9 +11,9 @@ loki:
   storage:
     type: s3
     bucketNames:
-      chunks: loki-chunks
-      ruler: loki-ruler
-      admin: loki-admin
+      chunks: fastapi-project-bucket-1
+      ruler: fastapi-project-bucket-2
+      admin: fastapi-project-bucket-3
     s3:
       region: us-east-1
       endpoint: s3.amazonaws.com
@@ -29,7 +29,6 @@ loki:
           period: 24h
 
   compactor:
-    enabled: true
     retention_enabled: true
     retention_delete_delay: 2h
     retention_delete_worker_count: 2
