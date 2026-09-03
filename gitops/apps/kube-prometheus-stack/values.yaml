@@ -51,7 +51,7 @@ alertmanager:
         email_configs:
           - to: 'your-email@example.com'
   
-grafana:
+grafana:                                
   admin:
     existingSecret: grafana-admin
     passwordKey: admin-password
@@ -78,7 +78,7 @@ grafana:
     storageClassName: gp3
     type: pvc
 
-  dashboards:
+  dashboards:               #custom dashboards
     fastapi:
       fastapi-observability:
         json: |
