@@ -1,5 +1,9 @@
 deploymentMode: SingleBinary
 
+memberlist:
+  service:
+    publishNotReadyAddresses: true
+
 loki:
   enabled: true
 
