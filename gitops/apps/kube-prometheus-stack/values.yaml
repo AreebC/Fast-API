@@ -51,10 +51,7 @@ alertmanager:
           - to: 'your-email@example.com'
   
 grafana:                                
-  admin:
-    existingSecret: grafana-admin
-    passwordKey: admin-password
-
+  
   additionalDataSources:
     - name: Loki
       type: loki
