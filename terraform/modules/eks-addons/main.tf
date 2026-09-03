@@ -23,3 +23,4 @@ resource "aws_eks_addon" "ebs_csi" {
 
   resolve_conflicts_on_create = "OVERWRITE"
 }
+
