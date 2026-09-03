@@ -84,7 +84,7 @@ module "ecr-pull-iam" {
 module "loki-irsa" {
   source               = "./modules/loki-irsa"
   project_name         = var.project_name
-  eks_OIDC             = module.eks.oidc_issuer_url
+  eks_OIDC             = module.eks-oidc.oidc_hostpath
   loki_namespace       = var.loki_namespace
   service_account_name = var.loki_service_account_name
   bucket_names         = [ 

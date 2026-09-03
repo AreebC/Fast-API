@@ -43,21 +43,23 @@ resource "aws_iam_role" "loki_irsa" {
   name = "${var.project_name}-LokiIRSA"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Principal = {
-          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.eks_OIDC}"
-        },
-        Action = "sts:AssumeRoleWithWebIdentity",
-        Condition = {
-          StringEquals = {
-            "${var.eks_OIDC}:sub" = "system:serviceaccount:${var.loki_namespace}:${var.service_account_name}"
-          }
+    Version = "2012-10-17"
+
+    Statement = [{
+      Effect = "Allow"
+
+      Principal = {
+        Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${var.eks_OIDC}"
+      }
+
+      Action = "sts:AssumeRoleWithWebIdentity"
+
+      Condition = {
+        StringEquals = {
+          "${var.eks_OIDC}:sub" = "system:serviceaccount:${var.loki_namespace}:${var.service_account_name}"
         }
       }
-    ]
+    }]
   })
 }
 
