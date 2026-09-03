@@ -33,7 +33,7 @@ loki:
     retention_delete_worker_count: 2
 
   limits_config:
-    retention_period: 168h  
+    retention_period: 168h
 
   ruler:
     storage:
@@ -42,13 +42,13 @@ loki:
         region: us-east-1
         endpoint: s3.amazonaws.com
 
-  singleBinary:
-    replicas: 1
+singleBinary:
+  replicas: 1
 
-    persistence:
-      enabled: true
-      size: 10Gi
-      storageClass: gp3
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: gp3
 
   resources:
     requests:
