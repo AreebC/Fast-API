@@ -87,7 +87,7 @@ module "loki-irsa" {
   eks_OIDC             = module.eks-oidc.oidc_hostpath
   loki_namespace       = var.loki_namespace
   service_account_name = var.loki_service_account_name
-  bucket_names         = [ 
+  bucket_names = [
     module.s3.bucket_name1,
     module.s3.bucket_name2,
     module.s3.bucket_name3
